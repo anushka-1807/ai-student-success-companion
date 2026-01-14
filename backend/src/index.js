@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const admin = require('firebase-admin');
+const path = require('path');
 
 const resumeController = require('./controllers/resumeController');
 const notesController = require('./controllers/notesController');
@@ -110,6 +111,16 @@ app.get('/api/history', authMiddleware, async (req, res) => {
     console.error('Error fetching history:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch history' });
   }
+});
+
+// Serve frontend static files (React build)
+const distPath = path.join(__dirname, '../../frontend/dist');
+
+app.use(express.static(distPath));
+
+// Fallback to index.html for React Router routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Error handling middleware
